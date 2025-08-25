@@ -170,28 +170,28 @@ bool CAcCdvd::Invoke(uint32 method, uint32* args, uint32 argsSize, uint32* ret, 
 {
 	switch(method)
 	{
-	case 0x02:
+	case CDE_OP::READY:
 		//CdStatus? or DiskReady?
 		//Game seems to want this to be 2 before proceeding
 		ret[0x01] = 2;
 		break;
-	case 0x03:
+	case CDE_OP::TYPE:
 		//CdType
 		CLog::GetInstance().Print(LOG_NAME, "CdType();\r\n");
 		ret[0x01] = m_cdvdman.CdGetDiskTypeDirect(m_opticalMedia);
 		break;
-	case 0x05:
+	case CDE_OP::GETPOS:
 		//Unknown, used by Ridge Racer
 		CLog::GetInstance().Print(LOG_NAME, "Cmd5();\r\n");
 		ret[0x01] = 1; //Result?
 		break;
-	case 0x07:
+	case CDE_OP::INIT:
 		//Init?
 		CLog::GetInstance().Print(LOG_NAME, "Cmd7();\r\n");
 		ret[0x01] = 1; //Result?
 		break;
-	case 0x09:
-	case 0x0A:
+	case CDE_OP::READ:
+	case CDE_OP::READI:
 		//Read?
 		ret[0x01] = 1; //Result?
 		{
@@ -202,12 +202,12 @@ bool CAcCdvd::Invoke(uint32 method, uint32* args, uint32 argsSize, uint32* ret, 
 			CLog::GetInstance().Print(LOG_NAME, "Read%d(start = 0x%08X, count = %d, dstAddr = 0x%08X);\r\n",
 			                          method, startSector, sectorCount, dstAddr);
 			auto fileSystem = m_opticalMedia->GetFileSystem();
-			auto dst = (method == 0x0A) ? m_iopRam : ram;
+			auto dst = (method == CDE_OP::READI) ? m_iopRam : ram;
 			for(unsigned int i = 0; i < sectorCount; i++)
 			{
 				uint32 dstOffset = (dstAddr + (i * sectorSize));
 				uint32 sectorIndex = startSector + i;
-				if((method == 0x0A) && (dstAddr >= 0x40000000))
+				if((method == CDE_OP::READI) && (dstAddr >= 0x40000000))
 				{
 					uint8 sectorData[sectorSize];
 					fileSystem->ReadBlock(sectorIndex, sectorData);
@@ -220,13 +220,13 @@ bool CAcCdvd::Invoke(uint32 method, uint32* args, uint32 argsSize, uint32* ret, 
 			}
 		}
 		break;
-	case 0x0B:
+	case CDE_OP::SYNC:
 		//Ridge Racer V uses this
 		//Time Crisis 3 uses this, fails to proceed if this doesn't return 0
 		ret[0x01] = 0;
 		CLog::GetInstance().Print(LOG_NAME, "CdSync();\r\n");
 		break;
-	case 0x0C:
+	case CDE_OP::LOOKUP:
 		//SearchFile?
 		{
 			const char* path = reinterpret_cast<const char*>(ram) + args[0];
@@ -241,18 +241,18 @@ bool CAcCdvd::Invoke(uint32 method, uint32* args, uint32 argsSize, uint32* ret, 
 			ret[0x0B] = ~0;
 		}
 		break;
-	case 0x0D:
+	case CDE_OP::SEEK:
 		//Seek?
 		ret[0x01] = 1; //Result?
 		CLog::GetInstance().Print(LOG_NAME, "Seek(sector = 0x%08X);\r\n", args[0]);
 		//args[0] = Sector Index?
 		//args[1] = ? 0xF
 		break;
-	case 0x0F:
+	case CDE_OP::STAT:
 		ret[0x01] = 2; //Result? (needs to be not 1 or 0x20)
 		CLog::GetInstance().Print(LOG_NAME, "Cmd15();\r\n");
 		break;
-	case 0x13:
+	case CDE_OP::READS:
 	{
 		uint32 sectorCount = args[0];
 		uint32 mode = args[1];
@@ -273,7 +273,7 @@ bool CAcCdvd::Invoke(uint32 method, uint32* args, uint32 argsSize, uint32* ret, 
 		}
 	}
 	break;
-	case 0x15:
+	case CDE_OP::STARTS:
 	{
 		//Stream Seek?
 		CLog::GetInstance().Print(LOG_NAME, "StSeek(sector = 0x%08X);\r\n", args[0]);
@@ -281,7 +281,7 @@ bool CAcCdvd::Invoke(uint32 method, uint32* args, uint32 argsSize, uint32* ret, 
 		ret[0x01] = 1;
 	}
 	break;
-	case 0x1A:
+	case CDE_OP::READRTC:
 	{
 		assert(retSize >= 0x10);
 		CLog::GetInstance().Print(LOG_NAME, "ReadRtc();\r\n");

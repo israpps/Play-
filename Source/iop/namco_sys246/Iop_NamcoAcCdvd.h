@@ -23,6 +23,37 @@ namespace Iop
 			std::string GetFunctionName(unsigned int) const override;
 			void Invoke(CMIPS&, unsigned int) override;
 			bool Invoke(uint32, uint32*, uint32, uint32*, uint32, uint8*) override;
+			enum CDE_OP
+			{
+				UNK0 = 0,
+				UNK1,
+				READY,
+				TYPE,
+				ERROR,
+				GETPOS,
+				READTOC,
+				INIT,
+				PAUSE,
+				READ,
+				READI,
+				SYNC,
+				LOOKUP,
+				SEEK,
+				STANDBY,
+				STAT,
+				STOP,
+				TRAY,
+				INITS,
+				READS,
+				SEEKS,
+				STARTS,
+				STATS,
+				STOPS,
+				PAUSES,
+				RESUMES,
+				READRTC,
+				COUNT
+			};
 
 		private:
 			enum
