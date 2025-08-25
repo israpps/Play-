@@ -745,6 +745,8 @@ void CSys246::ProcessAcFlashCommand(const SIFCMDHEADER*, CSifMan& sifMan)
 	//This is needed for Tekken 5: Dark Ressurection and Tekken 5.1
 	//Not sure what these games use this for, but they will hang after
 	//one stage if we don't send a reply to the EE.
+	// ACFLASH only serves a purpose on developer hardware, since the flash memory it interfaces with does not exist on normal system246
+	// for reference: https://github.com/ps2dev/ps2sdk/tree/master/iop/arcade/acflash
 
 	CLog::GetInstance().Print(LOG_NAME, "ProcessAcFlashCommand();\r\n");
 
